@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Comparison Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .site-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .site-button:active {
+            transform: translateY(0);
+        }
+
+        .amazon { background: linear-gradient(135deg, #ff9500, #ff6b35); }
+        .ebay { background: linear-gradient(135deg, #0064d2, #0053b0); }
+        .walmart { background: linear-gradient(135deg, #004c91, #003d7a); }
+        .target { background: linear-gradient(135deg, #cc0000, #aa0000); }
+        .bestbuy { background: linear-gradient(135deg, #0046be, #003799); }
+        .costco { background: linear-gradient(135deg, #00447c, #003566); }
+        .homedepot { background: linear-gradient(135deg, #f96302, #e55100); }
+        .newegg { background: linear-gradient(135deg, #ffb800, #ff9500); }
+        .athome { background: linear-gradient(135deg, #d32f2f, #b71c1c); }
+
+        .search-all-btn, .search-selected-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .search-selected-btn {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            margin-top: 10px;
+        }
+
+        .search-all-btn:hover, .search-selected-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-selected-btn:hover {
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .search-all-btn:disabled, .search-selected-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .site-button.selected {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 0 0 6px rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .selection-info {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: #2e7d32;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .selection-info.show {
+            display: block;
+        }
+
+        .clear-selection {
+            background: none;
+            border: none;
+            color: #666;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .clear-selection:hover {
+            color: #333;
+        }
+
+        .tip {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Price Comparison</h1>
+        <p class="subtitle">Search across multiple retailers instantly</p>
+        
+        <div class="search-section">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Enter product name (e.g., iPhone 15, Nike Air Max)"
+                onkeypress="handleKeyPress(event)"
+            >
+            
+            <div class="button-grid">
+                <button class="site-button amazon" onclick="toggleSite('amazon')">Amazon</button>
+                <button class="site-button ebay" onclick="toggleSite('ebay')">eBay</button>
+                <button class="site-button walmart" onclick="toggleSite('walmart')">Walmart</button>
+                <button class="site-button target" onclick="toggleSite('target')">Target</button>
+                <button class="site-button bestbuy" onclick="toggleSite('bestbuy')">Best Buy</button>
+                <button class="site-button costco" onclick="toggleSite('costco')">Costco</button>
+                <button class="site-button homedepot" onclick="toggleSite('homedepot')">Home Depot</button>
+                <button class="site-button newegg" onclick="toggleSite('newegg')">Newegg</button>
+                <button class="site-button athome" onclick="toggleSite('athome')">At Home</button>
+            </div>
+            
+            <div class="selection-info" id="selectionInfo">
+                <span id="selectionCount">0</span> retailers selected
+            </div>
+            
+            <button class="search-selected-btn" id="searchSelectedBtn" onclick="searchSelectedSites()" style="display: none;">
+                ✓ Search Selected Sites
+            </button>
+            
+            <button class="search-all-btn" onclick="searchAllSites()">
+                🚀 Search All Sites
+            </button>
+            
+            <button class="clear-selection" onclick="clearSelection()">
+                Clear Selection
+            </button>
+        </div>
+        
+        <div class="tip">
+            💡 <strong>Tip:</strong> Click individual buttons to search one site, or use "Search All Sites" to open all retailers at once. Make sure your browser allows pop-ups for the best experience.
+        </div>
+    </div>
+
+    <script>
+        const sites = {
+            amazon: 'https://www.amazon.com/s?k=',
+            ebay: 'https://www.ebay.com/sch/i.html?_nkw=',
+            walmart: 'https://www.walmart.com/search?q=',
+            target: 'https://www.target.com/s?searchTerm=',
+            bestbuy: 'https://www.bestbuy.com/site/searchpage.jsp?st=',
+            costco: 'https://www.costco.com/CatalogSearch?keyword=',
+            homedepot: 'https://www.homedepot.com/s/',
+            newegg: 'https://www.newegg.com/p/pl?d=',
+            athome: 'https://www.athome.com/search?q='
+        };
+
+        let selectedSites = new Set();
+
+        function toggleSite(siteName) {
+            const button = document.querySelector(`.site-button.${siteName}`);
+            
+            if (selectedSites.has(siteName)) {
+                selectedSites.delete(siteName);
+                button.classList.remove('selected');
+            } else {
+                selectedSites.add(siteName);
+                button.classList.add('selected');
+            }
+            
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const selectionInfo = document.getElementById('selectionInfo');
+            const selectionCount = document.getElementById('selectionCount');
+            const searchSelectedBtn = document.getElementById('searchSelectedBtn');
+            
+            const count = selectedSites.size;
+            selectionCount.textContent = count;
+            
+            if (count > 0) {
+                selectionInfo.classList.add('show');
+                searchSelectedBtn.style.display = 'block';
+            } else {
+                selectionInfo.classList.remove('show');
+                searchSelectedBtn.style.display = 'none';
+            }
+        }
+
+        function searchSelectedSites() {
+            if (selectedSites.size === 0) {
+                alert('Please select at least one retailer first!');
+                return;
+            }
+            
+            const searchTerm = getSearchTerm();
+            if (!searchTerm) return;
+            
+            // Add a small delay between opening tabs
+            let index = 0;
+            selectedSites.forEach((siteName) => {
+                setTimeout(() => {
+                    const url = sites[siteName] + searchTerm;
+                    window.open(url, '_blank');
+                }, index * 200);
+                index++;
+            });
+        }
+
+        function clearSelection() {
+            selectedSites.clear();
+            document.querySelectorAll('.site-button.selected').forEach(button => {
+                button.classList.remove('selected');
+            });
+            updateSelectionUI();
+        }
+
+        function getSearchTerm() {
+            const searchInput = document.getElementById('searchInput');
+            const term = searchInput.value.trim();
+            
+            if (!term) {
+                alert('Please enter a product name to search for!');
+                searchInput.focus();
+                return null;
+            }
+            
+            return encodeURIComponent(term);
+        }
+
+        function searchSite(siteName) {
+            const searchTerm = getSearchTerm();
+            if (!searchTerm) return;
+            
+            const url = sites[siteName] + searchTerm;
+            window.open(url, '_blank');
+        }
+
+        function searchAllSites() {
+            const searchTerm = getSearchTerm();
+            if (!searchTerm) return;
+            
+            // Add a small delay between opening tabs to prevent browser blocking
+            Object.keys(sites).forEach((siteName, index) => {
+                setTimeout(() => {
+                    const url = sites[siteName] + searchTerm;
+                    window.open(url, '_blank');
+                }, index * 200);
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                searchAllSites();
+            }
+        }
+
+        // Focus on input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').focus();
+        });
+    </script>
+</body>
+</html>
